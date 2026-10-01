@@ -13,7 +13,7 @@ arm64/x64 on Node 22+ and Bun; extraction uses system `tar`.
 - `src/session-cost.ts` — targeted harness invocations and strict response parsing.
 - `src/index.ts` — public API; internal test injection helpers are not re-exported.
 - `tests/` — Bun parsing, execution and fake-tarball tests; real test is opt-in.
-- [README](./README.md) — API, cache, descriptor updates, verification and publishing.
+- [README](./README.md) — installation, public API, supported platforms, cache and errors.
 
 ## Commands and conventions
 
@@ -25,3 +25,8 @@ than fall back to fabricated values.
 Release uses Changesets and npm OIDC. Add changesets with `bunx changeset`.
 Do not guess production descriptor values or publish without real-binary
 verification. The fork is a separate repository, not part of this library.
+Update binary pins only in `src/binary.ts`. Real verification uses
+`CCUSAGE_TEST_REAL=1` and `CCUSAGE_TEST_{CLAUDE,CODEX,OPENCODE}_SESSION_ID`
+with `bun test tests/real.test.ts`; compare results with the calculate-mode CLI.
+The release workflow watches `.changeset/**`; dispatch it manually to refresh
+the Version PR after other main-branch changes.

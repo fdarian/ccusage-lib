@@ -1,1 +1,5 @@
 enableGlobalVirtualStore: true
+packageExtensions:
+  bun-types@1.4.2:
+    dependencies:
+      undici-types: '~8.9.0'

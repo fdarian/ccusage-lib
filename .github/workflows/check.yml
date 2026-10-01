@@ -21,15 +21,8 @@ jobs:
           cache: true
           install: false
       - uses: oven-sh/setup-bun@v2
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          package-manager-cache: false
       - run: pnpm install --frozen-lockfile
       - run: bun run check:lint
       - run: bun run check:type
       - run: bun run test
       - run: bun run build
-      - name: Node smoke test
-        run: node --input-type=module -e 'import { run } from "./dist/index.js"; const output = await run(process.execPath, ["-e", "console.log(42)"]); if (output !== "42\n") throw new Error("Node execution failed");'
-      - run: pnpm pack

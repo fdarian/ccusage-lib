@@ -162,6 +162,8 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+packageExtensionsChecksum: sha256-iWQucnZefiEIZiJy27t4k5Vh1Mj0wk1IT1dpCdTlVyA=
+
 importers:
 
   .:
@@ -172,6 +174,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.31.1
         version: 2.31.1(@types/node@26.6.3)
+      '@total-typescript/tsconfig':
+        specifier: ^1.0.4
+        version: 1.0.4
       '@types/bun':
         specifier: ^1.4.2
         version: 1.4.2
@@ -434,6 +439,9 @@ packages:
 
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
+
+  '@total-typescript/tsconfig@1.0.4':
+    resolution: {integrity: sha512-fO4ctMPGz1kOFOQ4RCPBRBfMy3gDn+pegUfrGyUFRMv/Rd0ZM3/SHH3hFCYG4u6bPLG8OlmOGcBLDexvyr3A5w==}
 
   '@types/bun@1.4.2':
     resolution: {integrity: sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ==}
@@ -1406,6 +1414,8 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
+  '@total-typescript/tsconfig@1.0.4': {}
+
   '@types/bun@1.4.2':
     dependencies:
       bun-types: 1.4.2
@@ -1575,6 +1585,7 @@ snapshots:
   bun-types@1.4.2:
     dependencies:
       '@types/node': 26.6.3
+      undici-types: 8.9.0
 
   cac@7.0.0: {}
 

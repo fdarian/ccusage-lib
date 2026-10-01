@@ -1,17 +1,8 @@
 {
+	"extends": "@total-typescript/tsconfig/bundler/no-dom/library",
 	"compilerOptions": {
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"lib": ["ES2022", "DOM"],
 		"types": ["node", "bun"],
-		"strict": true,
-		"exactOptionalPropertyTypes": true,
-		"noUncheckedIndexedAccess": true,
-		"noImplicitOverride": true,
-		"noEmit": true,
-		"skipLibCheck": true,
-		"isolatedModules": true
+		"exactOptionalPropertyTypes": true
 	},
 	"include": ["src", "tests", "tsdown.config.ts"]
 }
