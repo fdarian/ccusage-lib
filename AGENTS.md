@@ -6,8 +6,8 @@ arm64/x64 on Node 22+ and Bun; extraction uses system `tar`.
 
 ## Map
 
-- `src/binary.ts` — sole production release descriptor; deliberately unconfigured
-  until verified fork release metadata is available.
+- `src/binary.ts` — sole production release descriptor, pinned to the fork's
+  `0.0.0-fdarian.2` release.
 - `src/ensure-binary.ts` — checksum verification and atomic versioned cache install.
 - `src/run.ts` — process execution, environment overrides, timeout and errors.
 - `src/session-cost.ts` — targeted harness invocations and strict response parsing.

@@ -1,7 +1,6 @@
 export { type BinaryDescriptor, type BinaryTarget, binary } from "./binary.js";
 export { type EnsureBinaryOptions, ensureBinary } from "./ensure-binary.js";
 export {
-	BinaryConfigurationError,
 	CcusageError,
 	ChecksumMismatchError,
 	SessionNotFoundError,

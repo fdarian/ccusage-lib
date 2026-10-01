@@ -131,7 +131,19 @@ export async function runSessionCost(
 			"calculate",
 		],
 		options,
-	);
+	).catch((cause: unknown) => {
+		const label = harness === "codex" ? "Codex" : "OpenCode";
+		const missing = `Error: CliError("No ${label} session found with ID: ${options.sessionId}")\n`;
+		if (
+			harness !== "claude" &&
+			cause instanceof CcusageError &&
+			cause.exitCode === 1 &&
+			cause.stderr === missing
+		) {
+			throw new SessionNotFoundError(harness, options.sessionId);
+		}
+		throw cause;
+	});
 	return parseSessionCost(harness, options.sessionId, stdout);
 }
 

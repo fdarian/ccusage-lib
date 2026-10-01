@@ -11,11 +11,12 @@ import {
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { type BinaryDescriptor, binary } from "../src/binary.js";
+import type { BinaryDescriptor } from "../src/binary.js";
 import { ensureBinary, installBinary } from "../src/ensure-binary.js";
 import {
-	BinaryConfigurationError,
+	CcusageError,
 	ChecksumMismatchError,
+	SessionNotFoundError,
 	UnsupportedPlatformError,
 } from "../src/errors.js";
 import { run } from "../src/run.js";
@@ -48,6 +49,10 @@ beforeAll(async () => {
 if [ "$1" = "--version" ]; then printf 'fake-test-binary\\n'; exit 0; fi
 if [ "$CODEX_HOME" != "/test/codex" ]; then echo 'env was not forwarded' >&2; exit 2; fi
 case "$*" in
+  'session --json --id missing --mode calculate') printf 'null\n';;
+  'codex session --json --id missing --mode calculate') printf 'Error: CliError("No Codex session found with ID: missing")\n' >&2; exit 1;;
+  'opencode session --json --id missing --mode calculate') printf 'Error: CliError("No OpenCode session found with ID: missing")\n' >&2; exit 1;;
+  'codex session --json --id ambiguous --mode calculate') printf 'Error: CliError("Codex session ID ambiguous is ambiguous and matches 2 sessions.")\n' >&2; exit 1;;
   'session --json --id test-id --mode calculate') printf '%s\\n' '${JSON.stringify({ sessionId: "test-id", totalCost: payload.totalCost, entries: [payload] })}';;
   'codex session --json --id test-id --mode calculate'|'opencode session --json --id test-id --mode calculate') printf '%s\\n' '${JSON.stringify(payload)}';;
   *) echo 'wrong args' >&2; exit 3;;
@@ -56,6 +61,32 @@ esac
 	);
 	await run("tar", ["-czf", join(root, "fake.tgz"), "-C", root, "package"]);
 	await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+});
+
+test("maps only exact release not-found errors, not other command failures", async () => {
+	const binaryPath = await installBinary(
+		await descriptor("not-found"),
+		"darwin-arm64",
+		{ cacheDir: join(root, "not-found") },
+	);
+	for (const harness of ["claude", "codex", "opencode"] as const) {
+		await expect(
+			runSessionCost(binaryPath, harness, {
+				sessionId: "missing",
+				env: { CODEX_HOME: "/test/codex" },
+			}),
+		).rejects.toBeInstanceOf(SessionNotFoundError);
+	}
+	try {
+		await runSessionCost(binaryPath, "codex", {
+			sessionId: "ambiguous",
+			env: { CODEX_HOME: "/test/codex" },
+		});
+		throw new Error("Expected ambiguous session error");
+	} catch (cause) {
+		expect(cause).toBeInstanceOf(CcusageError);
+		expect(cause).not.toBeInstanceOf(SessionNotFoundError);
+	}
 });
 
 afterAll(async () => {
@@ -175,15 +206,13 @@ test("rejects unsafe metadata", async () => {
 	).rejects.toThrow("parent traversal");
 });
 
-test.skipIf(binary !== undefined)(
-	"production installation fails explicitly until the release is configured",
+test.skipIf(
+	process.platform === "darwin" && ["arm64", "x64"].includes(process.arch),
+)(
+	"production installation rejects unsupported platforms before downloading",
 	async () => {
 		await expect(
 			ensureBinary({ cacheDir: join(root, "production") }),
-		).rejects.toBeInstanceOf(
-			process.platform === "darwin" && ["arm64", "x64"].includes(process.arch)
-				? BinaryConfigurationError
-				: UnsupportedPlatformError,
-		);
+		).rejects.toBeInstanceOf(UnsupportedPlatformError);
 	},
 );

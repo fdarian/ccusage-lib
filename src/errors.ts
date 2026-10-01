@@ -20,13 +20,6 @@ export class UnsupportedPlatformError extends CcusageError {
 	}
 }
 
-export class BinaryConfigurationError extends CcusageError {
-	override readonly name = "BinaryConfigurationError";
-	constructor() {
-		super("The pinned binary release is not configured in src/binary.ts");
-	}
-}
-
 export class ChecksumMismatchError extends CcusageError {
 	override readonly name = "ChecksumMismatchError";
 	constructor(

@@ -4,12 +4,8 @@ Promise-based per-session API-price costs for Claude, Codex, and OpenCode. Plain
 TypeScript, zero runtime dependencies, Node 22+ and Bun. macOS arm64/x64 only;
 installation needs global `fetch` and system `tar`.
 
-**Release preparation:** the binary descriptor is deliberately unconfigured.
-`ensureBinary` and `sessionCost` throw `BinaryConfigurationError` on supported
-machines until verified fork release metadata is added. Nothing is published yet.
-Parser fixtures use the supplied oagent Claude/Codex reference; OpenCode follows
-the planned Codex-compatible targeted response. Confirm all shapes and not-found
-behavior against the fork's Release notes before publishing.
+The binary is pinned to the fork's [`0.0.0-fdarian.2` release](https://github.com/fdarian/ccusage/releases/tag/v0.0.0-fdarian.2),
+with verified SHA-256 values for both macOS architectures.
 
 ## Usage
 
@@ -33,6 +29,11 @@ try {
 Returns `{ inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens,
 totalCostUsd }`. Each command targets `session --json --id` with
 `--mode calculate` to report API-price cost rather than recorded provider cost.
+Claude exposes this flag in help; Codex and OpenCode accept the same flag even
+though it is omitted from their subcommand help. Claude's token buckets are
+summed from `entries`; all harnesses use top-level calculated `totalCost`.
+Claude's JSON `null` and the exact Codex/OpenCode CLI not-found failures become
+`SessionNotFoundError`; ambiguous IDs and other command failures stay `CcusageError`.
 Environment overrides merge with `process.env`. Timeout applies to each binary
 invocation; download separately has a 60-second deadline.
 
@@ -58,7 +59,7 @@ To pin the fork or switch to upstream npm platform tarballs, edit only
 `src/binary.ts`: provide `version`, `urlTemplate`, `sha256` for `darwin-arm64` and
 `darwin-x64`, and `executablePath`. Template placeholders are `{version}`,
 `{target}`, `{platform}`, and `{arch}`. Upstream npm's inspected layout is
-`package/bin/ccusage`; confirm the fork uses that layout. Never put guessed URLs,
+`package/bin/ccusage`, matching the pinned fork. Never put guessed URLs,
 versions, or checksums in the production descriptor.
 
 ## Development
@@ -80,9 +81,9 @@ CCUSAGE_TEST_OPENCODE_SESSION_ID=... \
 CODEX_HOME="$HOME/.codex-oagent" bun test tests/real.test.ts
 ```
 
-Compare each real result with the matching CLI session before release; the gated
-test verifies download/execution and numeric responses, not an independent price
-oracle.
+The gated test verifies the pinned version, numeric responses, and not-found
+behavior. Compare each real result with the matching calculate-mode CLI session
+before updating the pin; the test is not an independent price oracle.
 
 ## Publishing
 
@@ -91,9 +92,17 @@ changeset changes to main, opens a Version Packages PR, and publishes after its
 merge with npm provenance and OIDC (no npm token). Check CI runs on Linux and
 macOS, including the bundled library under Node.
 
-Before the first push, configure the binary pin and verify real sessions. When
-the GitHub repository is created, enable **Allow GitHub Actions to create and
-approve pull requests**. npm trusted publishing requires an existing package:
-bootstrap the first publish manually with `npm publish --access public`, then
-configure npm's trusted publisher for `fdarian/ccusage-lib`, `release.yml` on
-`main`. No GitHub repository or remote is created by local setup.
+Enable **Allow GitHub Actions to create and approve pull requests** in repository
+settings. npm trusted publishing requires an existing package. Bootstrap
+`ccusage-lib@0.0.0` manually from main before merging the initial Version Packages
+PR, then configure npm's trusted publisher for GitHub Actions:
+
+- Repository owner: `fdarian`
+- Repository name: `ccusage-lib`
+- Workflow filename: `release.yml`
+- Environment name: leave empty (the job does not use a GitHub environment)
+
+Do not bootstrap `0.1.0`: that is the Version PR's publish version. Local
+bootstrap cannot produce CI provenance; use `npm publish --access public
+--provenance=false`. Subsequent CI publishes use OIDC and provenance; no
+`NPM_TOKEN` or `NODE_AUTH_TOKEN` repository secret is needed.
