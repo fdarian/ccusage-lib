@@ -8,14 +8,14 @@ export type BinaryDescriptor = {
 };
 
 export const binary: BinaryDescriptor = {
-	version: "0.0.0-fdarian.2",
+	version: "0.0.0-fdarian.3",
 	urlTemplate:
 		"https://github.com/fdarian/ccusage/releases/download/v{version}/ccusage-{target}.tgz",
 	sha256: {
 		"darwin-arm64":
-			"b64605b0c83ff9b79bfff56342302bf8c170ffa286f3b143f42a7b973e27dd28",
+			"e907980fe198214b361a7717e71e3d493ec3e44ad59bd7a859a48f1d37bc1e78",
 		"darwin-x64":
-			"0dfe92268d27ea000a5b1aaccb24f1f1f21dd4dbf11dc630950706ff165a2b75",
+			"32d6a4ae3e44e815946c32c746ba8afab6997f478228bdb3051a931227b14d8e",
 	},
 	executablePath: "package/bin/ccusage",
 };

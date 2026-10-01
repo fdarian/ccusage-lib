@@ -60,7 +60,7 @@ options without `harness`.
 ## Binary download and cache
 
 The first call downloads a pinned native ccusage binary from the
-[`fdarian/ccusage` GitHub release](https://github.com/fdarian/ccusage/releases/tag/v0.0.0-fdarian.2),
+[`fdarian/ccusage` GitHub release](https://github.com/fdarian/ccusage/releases/tag/v0.0.0-fdarian.3),
 verifies its SHA-256 checksum, and extracts it using system `tar`. An internet
 connection is required for the first download, which has a 60-second deadline.
 The fork supports targeted OpenCode session lookup and token-based API pricing.
@@ -69,11 +69,11 @@ You do not need to install ccusage separately.
 The executable is cached at:
 
 ```text
-$XDG_CACHE_HOME/ccusage-lib/0.0.0-fdarian.2/ccusage
+$XDG_CACHE_HOME/ccusage-lib/0.0.0-fdarian.3/ccusage
 ```
 
 If `XDG_CACHE_HOME` is unset, the base directory is `~/.cache`.
-With `cacheDir`, the path is `<cacheDir>/0.0.0-fdarian.2/ccusage`.
+With `cacheDir`, the path is `<cacheDir>/0.0.0-fdarian.3/ccusage`.
 Subsequent calls reuse the cached executable; concurrent downloads are safe.
 Cached binaries are trusted locally and are not rehashed on each call. Remove
 the version directory to reinstall a damaged or non-executable cache.
