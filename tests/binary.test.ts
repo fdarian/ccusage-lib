@@ -47,8 +47,11 @@ beforeAll(async () => {
 		`#!/bin/sh
 if [ "$1" = "--version" ]; then printf 'fake-test-binary\\n'; exit 0; fi
 if [ "$CODEX_HOME" != "/test/codex" ]; then echo 'env was not forwarded' >&2; exit 2; fi
-if [ "$*" != 'codex session --json --id test-id --mode calculate' ]; then echo 'wrong args' >&2; exit 3; fi
-printf '%s\\n' '${JSON.stringify(payload)}'
+case "$*" in
+  'session --json --id test-id --mode calculate') printf '%s\\n' '${JSON.stringify({ sessionId: "test-id", totalCost: payload.totalCost, entries: [payload] })}';;
+  'codex session --json --id test-id --mode calculate'|'opencode session --json --id test-id --mode calculate') printf '%s\\n' '${JSON.stringify(payload)}';;
+  *) echo 'wrong args' >&2; exit 3;;
+esac
 `,
 	);
 	await run("tar", ["-czf", join(root, "fake.tgz"), "-C", root, "package"]);
@@ -90,18 +93,20 @@ test("downloads, verifies, caches, and executes a local tarball", async () => {
 	expect(requests.length - before).toBe(1);
 	expect(requests.at(-1)).toBe("/cache/darwin-arm64");
 	expect(await readdir(options.cacheDir)).toEqual(["cache"]);
-	expect(
-		await runSessionCost(binaryPath, "codex", {
-			sessionId: "test-id",
-			env: { CODEX_HOME: "/test/codex" },
-		}),
-	).toEqual({
-		inputTokens: 10,
-		outputTokens: 20,
-		cacheCreationTokens: 30,
-		cacheReadTokens: 40,
-		totalCostUsd: 0.25,
-	});
+	for (const harness of ["claude", "codex", "opencode"] as const) {
+		expect(
+			await runSessionCost(binaryPath, harness, {
+				sessionId: "test-id",
+				env: { CODEX_HOME: "/test/codex" },
+			}),
+		).toEqual({
+			inputTokens: 10,
+			outputTokens: 20,
+			cacheCreationTokens: 30,
+			cacheReadTokens: 40,
+			totalCostUsd: 0.25,
+		});
+	}
 });
 
 test("same-process install races all use the atomic winner", async () => {

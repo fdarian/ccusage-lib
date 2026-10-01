@@ -1,13 +1,21 @@
 import { expect, test } from "bun:test";
-import { ensureBinary, type Harness, run, sessionCost } from "../src/index.js";
+import {
+	binary,
+	ensureBinary,
+	type Harness,
+	run,
+	sessionCost,
+} from "../src/index.js";
 
 test.skipIf(process.env.CCUSAGE_TEST_REAL !== "1")(
 	"downloads and executes the pinned release",
 	async () => {
 		const binaryPath = await ensureBinary();
-		expect(
-			(await run(binaryPath, ["--version"])).trim().length,
-		).toBeGreaterThan(0);
+		if (binary === undefined)
+			throw new Error("Release descriptor is not configured");
+		expect((await run(binaryPath, ["--version"])).trim()).toContain(
+			binary.version,
+		);
 		for (const harness of [
 			"claude",
 			"codex",
