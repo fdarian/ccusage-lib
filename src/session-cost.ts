@@ -66,7 +66,8 @@ export function parseSessionCost(
 			});
 		}
 	})();
-	if (response === null) throw new SessionNotFoundError(harness, sessionId);
+	if (harness === "claude" && response === null)
+		throw new SessionNotFoundError(harness, sessionId);
 	const entry = object(response);
 	if (harness === "claude") {
 		if (typeof entry.sessionId !== "string")

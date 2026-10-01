@@ -29,7 +29,10 @@ test("Claude sums entries and uses the session cost", () => {
 			JSON.stringify({
 				sessionId: "test",
 				totalCost: 0.25,
-				entries: [entry, entry],
+				entries: [
+					{ ...entry, costUSD: 99 },
+					{ ...entry, costUSD: 99 },
+				],
 			}),
 		),
 	).toEqual({
@@ -63,11 +66,6 @@ for (const harness of ["codex", "opencode"] as const) {
 }
 
 for (const harness of ["claude", "codex", "opencode"] as const) {
-	test(`${harness} reports null as not found`, () => {
-		expect(() => parseSessionCost(harness, "missing", "null")).toThrow(
-			SessionNotFoundError,
-		);
-	});
 	test(`${harness} rejects invalid JSON and invalid objects`, () => {
 		for (const raw of ["", "not json", "[]", "{}", "42"]) {
 			expect(() => parseSessionCost(harness, "test", raw)).toThrow(
@@ -76,6 +74,21 @@ for (const harness of ["claude", "codex", "opencode"] as const) {
 		}
 	});
 }
+
+test("only Claude's null response is not found", () => {
+	expect(() => parseSessionCost("claude", "missing", "null")).toThrow(
+		SessionNotFoundError,
+	);
+	for (const harness of ["codex", "opencode"] as const) {
+		try {
+			parseSessionCost(harness, "missing", "null");
+			throw new Error("Expected malformed response error");
+		} catch (cause) {
+			expect(cause).toBeInstanceOf(CcusageError);
+			expect(cause).not.toBeInstanceOf(SessionNotFoundError);
+		}
+	}
+});
 
 test("Claude mismatched IDs are not found", () => {
 	expect(() =>

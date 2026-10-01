@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { CcusageError } from "./errors.js";
 
 export type RunOptions = {
-	env?: NodeJS.ProcessEnv | undefined;
+	env?: Record<string, string | undefined> | undefined;
 	timeoutMs?: number | undefined;
 };
 

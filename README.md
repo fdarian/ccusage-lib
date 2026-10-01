@@ -101,8 +101,14 @@ PR, then configure npm's trusted publisher for GitHub Actions:
 - Repository name: `ccusage-lib`
 - Workflow filename: `release.yml`
 - Environment name: leave empty (the job does not use a GitHub environment)
+- Allowed action: `npm publish`
 
-Do not bootstrap `0.1.0`: that is the Version PR's publish version. Local
-bootstrap cannot produce CI provenance; use `npm publish --access public
---provenance=false`. Subsequent CI publishes use OIDC and provenance; no
-`NPM_TOKEN` or `NODE_AUTH_TOKEN` repository secret is needed.
+Do not bootstrap `0.1.0`: that is the Version PR's publish version. With a
+verified npm account and 2FA, run `npm login`, then:
+
+```sh
+npm publish --access public --provenance=false
+```
+
+Local bootstrap cannot produce CI provenance. Subsequent CI publishes use OIDC
+and provenance; no `NPM_TOKEN` or `NODE_AUTH_TOKEN` repository secret is needed.
