@@ -4,5 +4,8 @@
 	"files": { "ignoreUnknown": false },
 	"formatter": { "enabled": true, "indentStyle": "tab" },
 	"linter": { "enabled": true, "rules": { "preset": "recommended" } },
-	"assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } }
+	"assist": {
+		"enabled": true,
+		"actions": { "source": { "organizeImports": "on" } }
+	}
 }
