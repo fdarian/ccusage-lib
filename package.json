@@ -1,6 +1,6 @@
 {
 	"name": "ccusage-lib",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"description": "Per-session API-price costs from a pinned ccusage binary.",
 	"license": "MIT",
 	"type": "module",
